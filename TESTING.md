@@ -8,3 +8,6 @@
 - Generated API and browser artifact must match the same source revision.
 
 CI files are prepared locally; remote CI has not run because this repository has not been uploaded. Compatibility beyond README scope remains unverified.
+
+
+网络开发检查：`node tools/test-network.mjs`。仅本地回环 TCP，详情见 `evidence/network-focused-validation.json`；TLS 和独立服务器尚未验证。

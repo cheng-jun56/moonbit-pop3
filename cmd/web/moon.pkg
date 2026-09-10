@@ -8,5 +8,17 @@ supported_targets = "js"
 pkgtype(kind: "executable")
 
 options(
-  link: { "js": { "exports": [ "run" ], "format": "esm" } },
+  link: {
+    "js": {
+      "exports": [
+        "run",
+        "session_open",
+        "session_close",
+        "session_feed",
+        "session_finish",
+        "session_issue",
+      ],
+      "format": "esm",
+    },
+  },
 )

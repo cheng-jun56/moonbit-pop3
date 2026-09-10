@@ -32,6 +32,8 @@ try {
   if ($LASTEXITCODE -ne 0) {throw 'CLI test failed'}
   node tools/robustness.mjs
   if ($LASTEXITCODE -ne 0) {throw 'robustness failed'}
+  node tools/test-network.mjs
+  if ($LASTEXITCODE -ne 0) {throw 'network tests failed'}
   node tools/benchmark.mjs
   if ($LASTEXITCODE -ne 0) {throw 'benchmark failed'}
 } finally {Pop-Location}
