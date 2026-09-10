@@ -5,7 +5,7 @@ import * as core from '../web/engine.mjs';
 function checked(value){if(value.startsWith('ERROR:'))throw new Error(value);return value}
 export class Pop3Client {
  #key=randomUUID(); #socket; #pending; #closed=false; #timeout; #signal; #abort;
- constructor(options){
+ constructor(options={}){
   const {host='localhost',secure=true,port=secure?995:110,timeout=10000,signal,tls:tlsOptions={}}=options;
   if(!Number.isInteger(port)||port<1||port>65535||!Number.isFinite(timeout)||timeout<1)throw new Error('Invalid port or timeout');
   if(signal?.aborted)throw signal.reason instanceof Error?signal.reason:new Error('Aborted');
@@ -15,7 +15,7 @@ export class Pop3Client {
   // Attach handlers before handing the promise to callers, including sync setup failure.
   this.greeting.catch(()=>{});
   try {
-   this.#socket=secure?tls.connect({...tlsOptions,host,port,servername:tlsOptions.servername ?? (net.isIP(host)?undefined:host),rejectUnauthorized:true}):net.connect({host,port});
+   this.#socket=secure?tls.connect({...tlsOptions,host,port,servername:tlsOptions.servername ?? (net.isIP(host)?undefined:host),rejectUnauthorized:true,checkServerIdentity:tls.checkServerIdentity}):net.connect({host,port});
    this.#socket.on('data',chunk=>{
     try {
      const wire=checked(core.session_feed(this.#key,chunk.toString('hex')));
