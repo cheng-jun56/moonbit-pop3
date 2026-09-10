@@ -1,0 +1,47 @@
+{
+  "project": "moonbit-pop3",
+  "timestamp": "2026-09-10T10:40:37.036145+00:00",
+  "exit_code": 0,
+  "backend_test_counts": [
+    [
+      "5",
+      "5",
+      "0"
+    ],
+    [
+      "5",
+      "5",
+      "0"
+    ]
+  ],
+  "scope": "Local Windows verify.ps1; remote CI and full upstream conformance not run",
+  "coverage": {
+    "covered": 125,
+    "total": 162,
+    "measurement": "MoonBit instrumentation points, not upstream feature coverage"
+  },
+  "robustness": {
+    "project": "pop3",
+    "seed": 20260910,
+    "cases": 307,
+    "expected_error_responses": 306,
+    "uncaught_exceptions": 0,
+    "scope": "bounded malformed-input robustness, not proof of full language/protocol conformance"
+  },
+  "benchmark": {
+    "project": "pop3",
+    "utc": "2026-09-10T10:40:36.779Z",
+    "runtime": "v24.11.0",
+    "platform": "win32",
+    "cpu": "Intel(R) Core(TM) i7-14700HX",
+    "input_utf8_bytes": 77,
+    "samples": 30,
+    "warmup": 5,
+    "median_ms": 0.24080000000000013,
+    "p95_ms": 0.9135000000000062,
+    "max_ms": 1.0611000000000033,
+    "scope": "JS warm execution of documented example; no cross-project or upstream performance claim"
+  },
+  "remote_ci": "not run",
+  "network_interoperability": "not run"
+}
