@@ -1,0 +1,55 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "localreview/pop3"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+
+// Errors
+pub suberror PopError {
+  Invalid(String)
+} derive(@debug.Debug)
+
+// Types and methods
+pub(all) enum Command {
+  User(String)
+  Pass(String)
+  Stat
+  List(Int?)
+  Uidl(Int?)
+  Retr(Int)
+  Dele(Int)
+  Top(Int, Int)
+  Noop
+  Rset
+  Quit
+} derive(Eq, @debug.Debug)
+pub fn Command::encode(Self) -> String raise PopError
+
+pub(all) enum Phase {
+  Greeting
+  Authorization
+  Transaction
+  Closed
+} derive(Eq, @debug.Debug)
+
+pub struct Reply {
+  ok : Bool
+  message : String
+  body : Bytes
+} derive(Eq, @debug.Debug)
+
+pub struct Session {
+  // private fields
+} derive(@debug.Debug)
+pub fn Session::feed(Self, Bytes) -> Array[Reply] raise PopError
+pub fn Session::finish(Self) -> Unit raise PopError
+pub fn Session::issue(Self, Command) -> String raise PopError
+pub fn Session::new() -> Self
+pub fn Session::phase(Self) -> Phase
+
+// Type aliases
+
+// Traits

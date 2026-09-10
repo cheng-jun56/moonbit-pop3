@@ -1,0 +1,5 @@
+import {
+  "localreview/pop3" @lib,
+}
+
+pkgtype(kind: "executable")

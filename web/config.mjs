@@ -1,0 +1,1 @@
+export default {"slug": "pop3", "title": "POP3 协议核心", "description": "可接入任意传输层的增量响应解析与会话状态机", "source": "https://www.rfc-editor.org/rfc/rfc1939", "scope": "命令校验、状态转换、增量 CRLF、dot-unstuffing", "limitations": "TCP/TLS 适配器、真实邮箱互通、SASL", "version": "0.1.0", "example": "+OK message follows\nSubject: MoonBit\n\n..a dot-stuffed line\nHello from POP3\n.\n"};
