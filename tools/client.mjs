@@ -1,6 +1,6 @@
 import net from 'node:net';
 import tls from 'node:tls';
-import {randomUUID} from 'node:crypto';
+import {randomUUID,createHash} from 'node:crypto';
 import * as core from '../web/engine.mjs';
 function checked(value){if(value.startsWith('ERROR:'))throw new Error(value);return value}
 export class Pop3Client {
@@ -58,11 +58,11 @@ export class Pop3Client {
   core.session_close(this.#key);
   this.#socket?.destroy();
  }
- async command(verb,{argument='',index=-1,lines=0}={}){
+ async command(verb,{argument='',index=-1,lines=0,digest=''}={}){
   if(this.#closed)throw new Error('Connection closed');
   if(this.#pending)throw new Error('A command is already pending');
-  if(typeof verb!=='string'||typeof argument!=='string'||!Number.isInteger(index)||index < -1||index>2147483647||!Number.isInteger(lines)||lines<0||lines>2147483647)throw new Error('Invalid command arguments');
-  const wire=checked(core.session_issue(this.#key,verb.toUpperCase(),argument,index,lines));
+  if(typeof verb!=='string'||typeof argument!=='string'||typeof digest!=='string'||!Number.isInteger(index)||index < -1||index>2147483647||!Number.isInteger(lines)||lines<0||lines>2147483647)throw new Error('Invalid command arguments');
+  const wire=checked(core.session_issue(this.#key,verb.toUpperCase(),argument,index,lines,digest));
   const reply=this.#wait();
   this.#socket.write(wire,'utf8',error=>{if(error)this.#fail(error)});
   return reply;
@@ -73,6 +73,28 @@ export class Pop3Client {
   reply=await this.command('PASS',{argument:password});
   if(!reply.ok)throw new Error('PASS rejected: '+reply.message);
   return reply;
+ }
+ async apop(user,secret){
+  const greeting=await this.greeting;
+  const challenges=greeting.message.match(/<[^<>\s]+>/g)||[];
+  if(challenges.length!==1||!challenges[0].includes('@')||!/^[\x21-\x7e]+$/.test(challenges[0]))throw new Error('No unambiguous APOP challenge');
+  if(typeof secret!=='string'&&!Buffer.isBuffer(secret))throw new Error('APOP secret must be text or Buffer');
+  const digest=createHash('md5').update(challenges[0],'ascii').update(secret).digest('hex');
+  const reply=await this.command('APOP',{argument:user,digest});
+  if(!reply.ok)throw new Error('APOP rejected: '+reply.message);
+  return reply;
+ }
+ async capabilities(){
+  const reply=await this.command('CAPA');
+  if(!reply.ok)throw new Error('CAPA rejected: '+reply.message);
+  const capabilities=new Map();
+  for(const line of reply.body.toString('latin1').split('\r\n').slice(0,-1)){
+   if(!/^[\x21-\x7e]+(?: [\x21-\x7e]+)*$/.test(line))throw new Error('Invalid CAPA line');
+   const [tag,...args]=line.split(' '),key=tag.toUpperCase();
+   if(capabilities.has(key))throw new Error('Duplicate CAPA tag');
+   capabilities.set(key,args);
+  }
+  return capabilities;
  }
  async quit(){try{return await this.command('QUIT')}finally{this.close()}}
  close(){this.#fail(new Error('Client closed'))}

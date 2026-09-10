@@ -39,7 +39,7 @@ pub fn Session::issue(
     raise Invalid("session not ready for command")
   }
   match command {
-    User(_) =>
+    User(_) | Apop(_, _) =>
       if self.phase != Authorization {
         raise Invalid("USER outside authorization")
       }
@@ -47,7 +47,7 @@ pub fn Session::issue(
       if self.phase != Authorization || !self.user_ok {
         raise Invalid("PASS requires successful USER")
       }
-    Quit => ()
+    Quit | Capa => ()
     _ =>
       if self.phase != Transaction {
         raise Invalid("command requires authentication")
@@ -65,7 +65,7 @@ fn Session::complete(self : Session, ok : Bool, message : String) -> Reply {
   } else if self.pending is Some(command) {
     match command {
       User(_) => self.user_ok = ok
-      Pass(_) => if ok { self.phase = Transaction }
+      Pass(_) | Apop(_, _) => if ok { self.phase = Transaction }
       Quit => self.phase = Closed
       _ => ()
     }

@@ -16,6 +16,8 @@ pub suberror PopError {
 pub(all) enum Command {
   User(String)
   Pass(String)
+  Apop(String, String)
+  Capa
   Stat
   List(Int?)
   Uidl(Int?)

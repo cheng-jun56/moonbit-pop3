@@ -1,0 +1,27 @@
+{
+  "timestamp": "2026-09-10T13:47:56.298Z",
+  "coreTestsPassed": 3,
+  "results": [
+    {
+      "name": "APOP RFC 1939 independent digest vector and CAPA in both states",
+      "passed": true
+    },
+    {
+      "name": "missing challenge sends no authentication",
+      "passed": true
+    },
+    {
+      "name": "APOP rejection permits explicit USER PASS fallback",
+      "passed": true
+    },
+    {
+      "name": "CAPA rejection and duplicate tags are surfaced",
+      "passed": true
+    }
+  ],
+  "passed": 4,
+  "failed": 0,
+  "reference": "RFC 1939 APOP published digest vector",
+  "independentServerTested": false,
+  "fullSuiteRun": false
+}

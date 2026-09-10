@@ -100,3 +100,12 @@ try {
 测试需要 OpenSSL（可通过 OPENSSL 环境变量指定路径），每次在临时目录生成有效期一天、仅用于 localhost 的证书和私钥，结束后清理；不附带可复用私钥。结果见 `evidence/tls-focused-validation.json`。这是实际 TLS 握手和协议传输测试，POP3 响应仍由本项目测试服务器提供，独立邮件服务器互操作仍未完成。
 
 本轮未重复 TCP 或核心测试、未重新构建未变化的 MoonBit 引擎、未打包或上传。
+
+
+## 0.4.0：CAPA 与 APOP
+
+新增 CAPA（认证前后均可查询）与 APOP（仅认证阶段）。Node 客户端提供 `await client.capabilities()`，返回大写能力名到参数数组的 Map；以及 `await client.apop(user, secret)`，从 greeting 中获取唯一挑战，使用 Node MD5 计算摘要。secret 可用 UTF-8 字符串或 Buffer；不自动降级为 USER/PASS。APOP 是旧协议兼容能力，不替代 TLS，默认隐式 TLS 保持开启。
+
+核心验证摘要为 32 个小写十六进制字符，APOP 成功进入事务状态，失败保留认证状态。能力重复标签和非法行明确报错。仍缺 STLS、SASL 和独立邮件服务器互操作。
+
+3 组新增 MoonBit JS 测试、4 组新增回环网络测试通过；摘要与 [RFC 1939](https://datatracker.ietf.org/doc/html/rfc1939) 已发表向量一致。CAPA 参考 [RFC 2449](https://datatracker.ietf.org/doc/html/rfc2449)。证据见 `evidence/extensions-focused-validation.json`，复现命令 `node tools/test-extensions.mjs`。未重复旧套件或打包，旧归档继续保留历史快照。

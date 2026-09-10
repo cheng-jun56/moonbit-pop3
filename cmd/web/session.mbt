@@ -95,11 +95,14 @@ pub fn session_issue(
   text : String,
   index : Int,
   lines : Int,
+  digest : String,
 ) -> String {
   try {
     let c = match verb {
       "USER" => @lib.User(text)
       "PASS" => @lib.Pass(text)
+      "CAPA" => @lib.Capa
+      "APOP" => @lib.Apop(text, digest)
       "STAT" => @lib.Stat
       "LIST" => @lib.List(if index < 0 { None } else { Some(index) })
       "UIDL" => @lib.Uidl(if index < 0 { None } else { Some(index) })

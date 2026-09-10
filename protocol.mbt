@@ -7,6 +7,8 @@ pub suberror PopError {
 pub(all) enum Command {
   User(String)
   Pass(String)
+  Apop(String, String)
+  Capa
   Stat
   List(Int?)
   Uidl(Int?)
@@ -36,7 +38,7 @@ pub struct Reply {
 ///|
 fn Command::multiline(self : Command) -> Bool {
   match self {
-    List(None) | Uidl(None) | Retr(_) | Top(_, _) => true
+    Capa | List(None) | Uidl(None) | Retr(_) | Top(_, _) => true
     _ => false
   }
 }
@@ -63,6 +65,18 @@ pub fn Command::encode(self : Command) -> String raise PopError {
   let line = match self {
     User(s) => "USER " + arg(s)
     Pass(s) => "PASS " + arg(s)
+    Capa => "CAPA"
+    Apop(user, digest) => {
+      if digest.length() != 32 {
+        raise Invalid("APOP requires 32 hex digits")
+      }
+      for c in digest.iter() {
+        if !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')) {
+          raise Invalid("APOP requires lowercase hex")
+        }
+      }
+      "APOP " + arg(user) + " " + digest
+    }
     Stat => "STAT"
     List(n) =>
       "LIST" +
