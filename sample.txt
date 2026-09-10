@@ -1,0 +1,6 @@
++OK message follows
+Subject: MoonBit
+
+..a dot-stuffed line
+Hello from POP3
+.
