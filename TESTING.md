@@ -1,22 +1,54 @@
-# Validation contract
+# 测试与复现
 
-- Explicit Wasm-GC and JS targets: no inference from the toolchain default.
-- Public API tests plus compiled browser engine, CLI stdin/file/argument and failure exit-code checks.
-- 307 seeded bounded malformed inputs including UTF-16 surrogates. The worker has a 20-second limit.
-- Local code coverage: `moon coverage analyze -p localreview/pop3 -- -f summary`. No coverage upload is configured. Coverage is evidence about current code, not upstream feature coverage.
-- Benchmark: 5 warmups and 30 measured documented-example executions; median and p95 recorded locally.
-- Generated API and browser artifact must match the same source revision.
+## 本轮 2026-09-16
 
-CI files are prepared locally; remote CI has not run because this repository has not been uploaded. Compatibility beyond README scope remains unverified.
+POP3 0.5.0：15 项 MoonBit 测试分别在 JS 和 Wasm-GC 通过，覆盖旧功能与 TLS 升级/认证取消状态。17 组 `test-starttls.mjs` 场景通过；既有 5 组 TCP、5 组隐式 TLS、4 组 CAPA/APOP 回归检查通过。Dovecot 2.4.2 的 10 项独立流程通过，实际执行 TLS 升级、认证和邮箱操作。
 
+- `evidence/starttls-validation.json`：自编 TCP/TLS 场景，包含客户端/引擎 SHA-256。
+- `evidence/dovecot-validation.json`：独立服务器版本、Ubuntu 包指纹、实际流程及源码指纹。
+- `evidence/tls-auth-upgrade.json`：本版核心与宿主验证汇总。
 
-网络开发检查：`node tools/test-network.mjs`。仅本地回环 TCP，详情见 `evidence/network-focused-validation.json`；TLS 和独立服务器尚未验证。
+本轮未重复 20 项合集、覆盖率/模糊测试/性能基准，未重打 ZIP/bundle。旧 evidence 保留原日期和范围；不能将旧覆盖率当成当前功能覆盖。远程 CI、长期运行和完整上游兼容没有完成。
 
+## 常规验证
 
-## TLS 实机验证更新
+```sh
+moon fmt
+moon info
+moon check --target js --deny-warn
+moon test --target js --deny-warn
+moon test --target wasm-gc --deny-warn
+moon build --target js --deny-warn
+# 将 _build/js/debug/build/cmd/web/web.js 复制为 web/engine.mjs 后：
+node tools/test-demo.mjs
+node tools/test-cli.mjs
+node tools/test-network.mjs
+node tools/test-starttls.mjs
+```
 
-`node tools/test-tls.mjs` 的 5 组新增回环 TLS 测试通过：信任测试证书后完成 USER/PASS、二进制多行 RETR 和 QUIT；不可信证书、主机名不匹配均拒绝；握手未完成时仍受绝对超时和 AbortSignal 控制。客户端强制使用 Node 的证书链及主机名校验，传入 `rejectUnauthorized:false` 或自定义 `checkServerIdentity` 不会绕过验证。自建服务端可使用 `ca` 和正确的 `servername` 配置信任。
+网络测试需要 Node.js 和 OpenSSL；Windows 默认发现 Git 附带的 OpenSSL，也可用 OPENSSL 指定路径。每次生成短期 localhost 证书、只监听本机随机端口，结束后关闭 socket 并删除密钥。`verify.ps1` 和 CI 已接入专项网络检查；配置 CI 不代表远端已经运行。
 
-测试需要 OpenSSL（可通过 OPENSSL 环境变量指定路径），每次在临时目录生成有效期一天、仅用于 localhost 的证书和私钥，结束后清理；不附带可复用私钥。结果见 `evidence/tls-focused-validation.json`。这是实际 TLS 握手和协议传输测试，POP3 响应仍由本项目测试服务器提供，独立邮件服务器互操作仍未完成。
+## Dovecot 独立互通
 
-本轮未重复 TCP 或核心测试、未重新构建未变化的 MoonBit 引擎、未打包或上传。
+`tools/dovecot-reference.py` 只准备临时账号、证书、Maildir 和服务配置，协议由未经修改的 Dovecot 2.4 二进制处理。测试数据不是外部邮件，未连接用户真实邮箱。
+
+本次使用 Windows Node.js v24.11.0，经 localhost 访问 WSL Ubuntu 26.04 的 Dovecot 2.4.2（Ubuntu 包 1:2.4.2+dfsg1-3ubuntu2.1）。没有安装系统服务或改写主机的 /usr、/etc 文件。依赖只下载和解包到临时目录；私有 Linux 挂载命名空间提供运行路径和临时组映射。测试结束时停止子进程并撤销挂载，证书及邮箱被清理。
+
+准备对应 Ubuntu 26.04 依赖（在 WSL 中执行；本脚本不自动安装或下载）：
+
+```sh
+mkdir -p /tmp/moonbit-dovecot-deps/packages /tmp/moonbit-dovecot-deps/root
+cd /tmp/moonbit-dovecot-deps/packages
+apt-get download dovecot-core dovecot-imapd dovecot-pop3d dovecot-sieve libpcre2-32-0 libexttextcat-2.0-0 libicu78 liblua5.4-0
+for package in ./*.deb; do dpkg-deb -x "$package" ../root; done
+```
+
+然后在本项目的 Windows PowerShell 中执行：
+
+```powershell
+$env:WSL_DISTRO = 'Ubuntu-D'
+$env:DOVECOT_ROOT = '/tmp/moonbit-dovecot-deps/root'
+node tools/test-dovecot.mjs
+```
+
+提取包模式通过 WSL root 建立私有挂载命名空间；没有修改主机邮件服务或账号。Linux 原生运行可在已有 Dovecot 2.4 的隔离测试环境中以 root 运行同一 Node 脚本；本次实测的是上面的 Windows/WSL 路径。其它发行版的依赖名及 Dovecot 大版本需要单独适配。外部二进制不随本仓库分发。

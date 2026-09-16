@@ -1,54 +1,16 @@
 # 功能与兼容性边界
 
-## 新增能力
+0.5.0 已实现可用的 POP3 网络会话，仍不是完整成熟客户端。
 
-增加 STAT/LIST 的类型化响应读取和重复编号拒绝。
+| 能力 | 当前状态 | 验证与限制 |
+|---|---|---|
+| 命令/响应 | USER/PASS、APOP、CAPA、STAT/LIST/UIDL、RETR/TOP、DELE/RSET/NOOP/QUIT | 增量 CRLF、多行点转义、二进制正文和类型化 STAT/LIST |
+| 状态机 | Greeting/Authorization/TlsHandshake/Transaction/Closed | STLS 成功后的明文注入与握手期命令均拒绝；认证失败可重试 |
+| 传输 | TCP、默认隐式 TLS、显式/连接时要求 STLS | 证书链和主机名验证、超时、AbortSignal；无降级与自动重试 |
+| 认证 | USER/PASS、APOP、SASL PLAIN 空挑战响应 | 默认保护明文密码；PLAIN 暂限可打印 ASCII；无完整 SASLprep |
+| 独立互通 | Dovecot 2.4.2 的 TLS 升级、认证、读取、删除与重连 | 10 个实际流程通过，隔离临时邮箱，未测试外部邮箱账号 |
+| 错误路径 | 升级缺失/拒绝、证书错误、取消/超时、异常挑战、注入 | 17 组专项网络测试；原有 TCP/TLS/APOP 检查也通过 |
 
-## 尚未达到上游的部分
+仍缺其它 SASL、UTF8/LANG 等扩展、PIPELINING、流式大邮件、连接池、长期和负载验证。正文 8 MiB、正文行 64 KiB、核心同时 64 会话；状态行严格 UTF-8。USER/PASS 不接受空格与 Unicode，PLAIN 不接受 Unicode；这些限制仍需后续处理。
 
-仍缺 APOP、STLS 和独立服务器互操作；0.3.0 已补 TCP/隐式 TLS 接入。已有基础能力参见 README 与生成的 `pkg.generated.mbti`。
-
-## 工程交付范围
-
-独立 Git 仓库、独立构建目录、可执行文档、Wasm-GC/JS 测试、真实编译的浏览器与 CLI、边界输入检查、样例基准、CI 配置均随仓库交付。运行记录见 evidence；配置 CI 不代表远端 CI 已运行。没有公开发布或比赛验收结论。
-
-
-## 0.3.0 开发更新：真实网络客户端
-
-新增 `tools/client.mjs` 的 Pop3Client，直接复用 MoonBit Session 处理命令状态、CRLF 分片、多行终止与点转义。邮件正文以 Buffer 返回，保留非 UTF-8 字节。支持 USER/PASS、STAT、LIST、UIDL、RETR、DELE、TOP、NOOP、RSET、QUIT。
-
-```js
-import {Pop3Client} from './tools/client.mjs';
-const client = await Pop3Client.connect({host:'mail.example.com'});
-try {
-  await client.login(process.env.POP3_USER, process.env.POP3_PASSWORD);
-  const message = await client.command('RETR', {index:1});
-  if (!message.ok) throw new Error(message.message);
-  console.log(message.body.length);
-  await client.quit();
-} finally { client.close(); }
-```
-
-默认使用端口 995 的隐式 TLS，强制证书验证，支持通过 `tls:{ca,servername,...}` 提供信任配置。明文连接需显式设置 `secure:false`，默认端口 110。连接/greeting 和每条命令有独立绝对超时（默认 10 秒）；支持 AbortSignal。每次只允许一条待完成命令，繁忙时拒绝并发请求；断线/错误/取消会释放 MoonBit 会话并拒绝待完成请求。最多同时 64 个核心会话。服务端 -ERR 作为 `{ok:false,message,body}` 返回，login 遇到拒绝则抛错。close 立即断开；正常提交删除操作应使用 quit 并检查其响应。
-
-本轮 `node tools/test-network.mjs` 的 5 组真实回环 TCP 测试通过，覆盖分片 greeting、认证、二进制 RETR、-ERR 后恢复、QUIT、超时、截断、取消/并发保护及命令注入拒绝。TLS 接入已实现，但尚未做 TLS 实机测试；测试服务器由本项目编写，不是独立 POP3 实现的互操作证明。仍缺 STLS、APOP、CAPA/SASL 和独立邮件服务器对照。
-
-最新源码/引擎为 0.3.0 开发版，原 ZIP/bundle 保留历史打包快照；未上传，未重复旧测试或重新打包。
-
-
-## TLS 实机验证更新
-
-`node tools/test-tls.mjs` 的 5 组新增回环 TLS 测试通过：信任测试证书后完成 USER/PASS、二进制多行 RETR 和 QUIT；不可信证书、主机名不匹配均拒绝；握手未完成时仍受绝对超时和 AbortSignal 控制。客户端强制使用 Node 的证书链及主机名校验，传入 `rejectUnauthorized:false` 或自定义 `checkServerIdentity` 不会绕过验证。自建服务端可使用 `ca` 和正确的 `servername` 配置信任。
-
-测试需要 OpenSSL（可通过 OPENSSL 环境变量指定路径），每次在临时目录生成有效期一天、仅用于 localhost 的证书和私钥，结束后清理；不附带可复用私钥。结果见 `evidence/tls-focused-validation.json`。这是实际 TLS 握手和协议传输测试，POP3 响应仍由本项目测试服务器提供，独立邮件服务器互操作仍未完成。
-
-本轮未重复 TCP 或核心测试、未重新构建未变化的 MoonBit 引擎、未打包或上传。
-
-
-## 0.4.0：CAPA 与 APOP
-
-新增 CAPA（认证前后均可查询）与 APOP（仅认证阶段）。Node 客户端提供 `await client.capabilities()`，返回大写能力名到参数数组的 Map；以及 `await client.apop(user, secret)`，从 greeting 中获取唯一挑战，使用 Node MD5 计算摘要。secret 可用 UTF-8 字符串或 Buffer；不自动降级为 USER/PASS。APOP 是旧协议兼容能力，不替代 TLS，默认隐式 TLS 保持开启。
-
-核心验证摘要为 32 个小写十六进制字符，APOP 成功进入事务状态，失败保留认证状态。能力重复标签和非法行明确报错。仍缺 STLS、SASL 和独立邮件服务器互操作。
-
-3 组新增 MoonBit JS 测试、4 组新增回环网络测试通过；摘要与 [RFC 1939](https://datatracker.ietf.org/doc/html/rfc1939) 已发表向量一致。CAPA 参考 [RFC 2449](https://datatracker.ietf.org/doc/html/rfc2449)。证据见 `evidence/extensions-focused-validation.json`，复现命令 `node tools/test-extensions.mjs`。未重复旧套件或打包，旧归档继续保留历史快照。
+源码 0.5.0 与旧 ZIP/bundle 不同。CI 配置已准备，本地测试通过不等于远端 CI、公开发布或比赛验收。详见 README 和 TESTING。

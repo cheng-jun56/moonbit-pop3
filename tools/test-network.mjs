@@ -7,7 +7,7 @@ async function test(name,fn){try{await fn();results.push({name,passed:true})}cat
 async function server(fn,run){
  const sockets=new Set();const s=net.createServer(socket=>{sockets.add(socket);socket.on('error',()=>{});socket.on('close',()=>sockets.delete(socket));fn(socket)});
  await new Promise(r=>s.listen(0,'127.0.0.1',r));
- try{await run({host:'127.0.0.1',port:s.address().port,secure:false,timeout:1000})}finally{for(const socket of sockets)socket.destroy();await new Promise(r=>s.close(r))}
+ try{await run({host:'127.0.0.1',port:s.address().port,secure:false,allowInsecureAuth:true,timeout:1000})}finally{for(const socket of sockets)socket.destroy();await new Promise(r=>s.close(r))}
 }
 function conversation(socket){
  socket.write('+O');setTimeout(()=>socket.write('K ready\r\n'),5);

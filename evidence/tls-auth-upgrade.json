@@ -1,0 +1,36 @@
+{
+  "date": "2026-09-16T15:01:16.0513661Z",
+  "version": "0.5.0",
+  "moon": "0.1.20260904 (94521db)",
+  "moonc": "v0.10.12+1634b282e",
+  "jsTestsPassed": 15,
+  "wasmGcTestsPassed": 15,
+  "startTlsNetworkPassed": 17,
+  "independentDovecotPassed": 10,
+  "browserAndCliPassed": true,
+  "legacyNetworkChecksPassed": true,
+  "fullWorkspaceRechecked": false,
+  "coverageFuzzBenchmarkRepeated": false,
+  "archivesRebuilt": false,
+  "remoteCiRun": false,
+  "referenceCleanup": {
+    "hostDovecotGroupPresent": false,
+    "hostDoveconfPresent": false,
+    "hostDovecotLibPresent": false,
+    "temporaryServerDirectories": [],
+    "runningDovecotPids": []
+  },
+  "sourceSha256": {
+    "session.mbt": "49298bed04599d315cce0e776f93d2d06ddaaf61b28948de97e6241b69581a07",
+    "cmd/web/session.mbt": "273f87f0143e4eecc6998291c832d1871d8d0d7ccc10d1cb216168598befae1c",
+    "tools/client.mjs": "51dbb95177bcd2c7744de638c1f96ca21428ad2fed197a7c713b54531f6041f2",
+    "tools/dovecot-reference.py": "8ed02724058a006e2a62306f390a177de6edab400406ef3b479af2ca853d35e6",
+    "tools/test-dovecot.mjs": "37aaeadfab882401e51feb94e2c0d8b6f6b32185359704c9642451b4bf229b92",
+    "tools/test-starttls.mjs": "83bacfe74f76c437ca2f91f8c8f86849c09a988ddd88c08fa0a8bd0fdb7f5900",
+    "pkg.generated.mbti": "4ab69202bbde256febb118bf488b4c891c6fd5a290399c493c765ae8a7d473f9",
+    "web/engine.mjs": "64173416ca84f032706aca5ac495ca8a30f0ec64709f4287b89d5cd052bedf5e",
+    "protocol.mbt": "e2dd31c449c4306ff09552cdf5259bb86ba1341e636da8a1028e5b21002ba0e9",
+    "sasl.mbt": "8feffa5ff1f36e197fcee5a088b7064c09da95db50ff2ec5d6ec33da57cec175",
+    "tls_auth_test.mbt": "b77d8c2e14bffcd4677cc6f789894c21a20ecd3bab8b1791eea3e8eea14a301e"
+  }
+}

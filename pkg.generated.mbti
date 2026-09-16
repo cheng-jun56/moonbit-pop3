@@ -18,6 +18,8 @@ pub(all) enum Command {
   Pass(String)
   Apop(String, String)
   Capa
+  Stls
+  Auth(String)
   Stat
   List(Int?)
   Uidl(Int?)
@@ -33,6 +35,7 @@ pub fn Command::encode(Self) -> String raise PopError
 pub(all) enum Phase {
   Greeting
   Authorization
+  TlsHandshake
   Transaction
   Closed
 } derive(Eq, @debug.Debug)
@@ -41,6 +44,7 @@ pub struct Reply {
   ok : Bool
   message : String
   body : Bytes
+  continuation : Bool
 } derive(Eq, @debug.Debug)
 pub fn Reply::listing(Self) -> Array[(Int, Int)] raise PopError
 pub fn Reply::stat(Self) -> (Int, Int) raise PopError
@@ -48,11 +52,13 @@ pub fn Reply::stat(Self) -> (Int, Int) raise PopError
 pub struct Session {
   // private fields
 } derive(@debug.Debug)
+pub fn Session::authenticate_response(Self, String) -> String raise PopError
 pub fn Session::feed(Self, Bytes) -> Array[Reply] raise PopError
 pub fn Session::finish(Self) -> Unit raise PopError
 pub fn Session::issue(Self, Command) -> String raise PopError
 pub fn Session::new() -> Self
 pub fn Session::phase(Self) -> Phase
+pub fn Session::tls_established(Self) -> Unit raise PopError
 
 // Type aliases
 

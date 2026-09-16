@@ -9,6 +9,8 @@ pub(all) enum Command {
   Pass(String)
   Apop(String, String)
   Capa
+  Stls
+  Auth(String)
   Stat
   List(Int?)
   Uidl(Int?)
@@ -24,6 +26,7 @@ pub(all) enum Command {
 pub(all) enum Phase {
   Greeting
   Authorization
+  TlsHandshake
   Transaction
   Closed
 } derive(Debug, Eq)
@@ -33,6 +36,7 @@ pub struct Reply {
   ok : Bool
   message : String
   body : Bytes
+  continuation : Bool
 } derive(Debug, Eq)
 
 ///|
@@ -66,6 +70,13 @@ pub fn Command::encode(self : Command) -> String raise PopError {
     User(s) => "USER " + arg(s)
     Pass(s) => "PASS " + arg(s)
     Capa => "CAPA"
+    Stls => "STLS"
+    Auth(mechanism) => {
+      if mechanism != "PLAIN" {
+        raise Invalid("only AUTH PLAIN is supported")
+      }
+      "AUTH PLAIN"
+    }
     Apop(user, digest) => {
       if digest.length() != 32 {
         raise Invalid("APOP requires 32 hex digits")

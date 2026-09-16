@@ -10,7 +10,7 @@ async function server(greeting,handler,run){
   let input='';socket.on('data',chunk=>{input+=chunk;while(input.includes('\r\n')){const i=input.indexOf('\r\n'),line=input.slice(0,i);input=input.slice(i+2);received.push(line);handler(socket,line)}});
  });
  await new Promise(r=>s.listen(0,'127.0.0.1',r));
- try{const c=await Pop3Client.connect({host:'127.0.0.1',port:s.address().port,secure:false,timeout:1000});try{await run(c,received)}finally{c.close()}}
+ try{const c=await Pop3Client.connect({host:'127.0.0.1',port:s.address().port,secure:false,allowInsecureAuth:true,timeout:1000});try{await run(c,received)}finally{c.close()}}
  finally{for(const socket of sockets)socket.destroy();await new Promise(r=>s.close(r))}
 }
 await test('APOP RFC 1939 independent digest vector and CAPA in both states',()=>server('+OK ready <1896.697170952@dbc.mtview.ca.us>',(s,line)=>{

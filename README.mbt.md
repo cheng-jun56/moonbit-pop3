@@ -20,4 +20,4 @@ test "typed STAT and LIST reply consumers" {
 }
 ```
 
-限制：无 TLS/socket/APOP 及真实服务器互操作。
+0.5 已提供 TCP/隐式 TLS/STLS、APOP/PLAIN 与 Dovecot 互通。TLS 的可信握手由 Node 宿主实现；核心状态示例见 tls_auth_test.mbt。仍缺其它 SASL、PIPELINING 和流式大邮件。

@@ -63,6 +63,13 @@ pub fn session_close(key : String) -> Unit {
 }
 
 ///|
+pub fn session_phase(key : String) -> String {
+  Repr(session(key).phase()).to_string() catch {
+    e => "ERROR: " + Repr(e).to_string()
+  }
+}
+
+///|
 pub fn session_feed(key : String, chunk : String) -> String {
   session(key)
   .feed(unhex(chunk))
@@ -71,7 +78,9 @@ pub fn session_feed(key : String, chunk : String) -> String {
     ":" +
     hex(@utf8.encode(r.message)) +
     ":" +
-    hex(r.body)
+    hex(r.body) +
+    ":" +
+    (if r.continuation { "1" } else { "0" })
   })
   .join("\n") catch {
     e => "ERROR: " + Repr(e).to_string()
@@ -102,6 +111,8 @@ pub fn session_issue(
       "USER" => @lib.User(text)
       "PASS" => @lib.Pass(text)
       "CAPA" => @lib.Capa
+      "STLS" => @lib.Stls
+      "AUTH" => @lib.Auth(text)
       "APOP" => @lib.Apop(text, digest)
       "STAT" => @lib.Stat
       "LIST" => @lib.List(if index < 0 { None } else { Some(index) })
@@ -115,6 +126,23 @@ pub fn session_issue(
       _ => raise Failure("unsupported command")
     }
     session(key).issue(c)
+  } catch {
+    e => "ERROR: " + Repr(e).to_string()
+  }
+}
+
+///|
+pub fn session_continue(key : String, kind : String, data : String) -> String {
+  try {
+    let s = session(key)
+    match kind {
+      "tls" => {
+        s.tls_established()
+        ""
+      }
+      "auth" => s.authenticate_response(data)
+      _ => raise Failure("unknown continuation")
+    }
   } catch {
     e => "ERROR: " + Repr(e).to_string()
   }

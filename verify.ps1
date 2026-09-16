@@ -36,6 +36,10 @@ try {
   if ($LASTEXITCODE -ne 0) {throw 'network tests failed'}
   node tools/test-extensions.mjs
   if ($LASTEXITCODE -ne 0) {throw 'extension tests failed'}
+  node tools/test-tls.mjs
+  if ($LASTEXITCODE -ne 0) {throw 'TLS tests failed'}
+  node tools/test-starttls.mjs
+  if ($LASTEXITCODE -ne 0) {throw 'STLS and authentication tests failed'}
   node tools/benchmark.mjs
   if ($LASTEXITCODE -ne 0) {throw 'benchmark failed'}
 } finally {Pop-Location}

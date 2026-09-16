@@ -17,6 +17,8 @@ options(
         "session_feed",
         "session_finish",
         "session_issue",
+        "session_continue",
+        "session_phase",
       ],
       "format": "esm",
     },
