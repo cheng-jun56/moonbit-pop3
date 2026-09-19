@@ -1,4 +1,4 @@
-name = "localreview/pop3"
+name = "cheng-jun56/pop3"
 
 version = "0.5.0"
 
