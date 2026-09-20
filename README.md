@@ -1,5 +1,7 @@
 # POP3 会话与客户端
 
+> 2026-09-21 本地构建修复：命令包 import 已同步到当前 moon.mod 模块名；moon info/check、JS 构建、MoonBit 示例和 Node 引擎示例通过。算法未改，本轮未重跑历史全部行为/性能套件。当前提交指纹见 evidence/module-import-fix.json。
+
 本地开发版 **0.5.0**。MoonBit 负责命令校验、会话状态、增量 CRLF、多行终止和点转义；Node.js 提供 TCP、隐式 TLS、STLS、超时和取消。源码、生成接口和编译后的客户端核心均包含在本目录。
 
 ## 实际使用

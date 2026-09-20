@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "localreview/pop3"
+package "cheng-jun56/pop3"
 
 import {
   "moonbitlang/core/debug",

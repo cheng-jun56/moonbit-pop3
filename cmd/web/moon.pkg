@@ -1,5 +1,5 @@
 import {
-  "localreview/pop3" @lib,
+  "cheng-jun56/pop3" @lib,
   "moonbitlang/core/encoding/utf8",
 }
 
