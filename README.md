@@ -1,5 +1,13 @@
 # POP3 会话与客户端
 
+## 获取与验证入口
+
+公开源码：[github.com/cheng-jun56/moonbit-pop3](https://github.com/cheng-jun56/moonbit-pop3)；MoonBit 模块名为 `cheng-jun56/pop3`。
+
+从源码运行：`git clone https://github.com/cheng-jun56/moonbit-pop3.git` 后进入该目录，按下文和 [TESTING.md](TESTING.md) 安装所需工具。仓库公开不等于已在 Mooncakes 发布，不承诺 `moon add` 当前可用。
+
+查看 [GitHub Actions](https://github.com/cheng-jun56/moonbit-pop3/actions) 时请核对 run 的 commit SHA；历史 evidence、旧 ZIP 与本地测试不能替代当前提交的 CI 结果。下文保留各版本的验证范围和兼容性限制。
+
 本地开发版 **0.5.0**。MoonBit 负责命令校验、会话状态、增量 CRLF、多行终止和点转义；Node.js 提供 TCP、隐式 TLS、STLS、超时和取消。源码、生成接口和编译后的客户端核心均包含在本目录。
 
 ## 实际使用
@@ -75,4 +83,4 @@ node tools/cli.mjs --file sample.txt --json
 
 依据 [RFC 1939](https://www.rfc-editor.org/rfc/rfc1939)、[RFC 2449](https://www.rfc-editor.org/rfc/rfc2449)、[RFC 2595](https://www.rfc-editor.org/rfc/rfc2595)、[RFC 5034](https://www.rfc-editor.org/rfc/rfc5034) 和 [RFC 4616](https://www.rfc-editor.org/rfc/rfc4616) 原创实现。MIT 仅适用于本仓库原创文件。Dovecot 是独立测试依赖，其二进制不随仓库分发；测试适配器为原创。
 
-本目录是独立本地 Git 主仓库，无 remote、未上传或发布。旧 ZIP/bundle 仍是历史快照，本轮没有重打包；本版以仓库源码及 evidence 为准。
+> 历史开发记录（以下发布/归档状态不代表当前仓库；当前入口见文首）：本目录是独立本地 Git 主仓库，无 remote、未上传或发布。旧 ZIP/bundle 仍是历史快照，本轮没有重打包；本版以仓库源码及 evidence 为准。
