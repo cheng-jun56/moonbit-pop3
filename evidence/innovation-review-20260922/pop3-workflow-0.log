@@ -1,0 +1,1 @@
+[{"name":"APOP RFC 1939 independent digest vector and CAPA in both states","passed":true},{"name":"missing challenge sends no authentication","passed":true},{"name":"APOP rejection permits explicit USER PASS fallback","passed":true},{"name":"CAPA rejection and duplicate tags are surfaced","passed":true}]

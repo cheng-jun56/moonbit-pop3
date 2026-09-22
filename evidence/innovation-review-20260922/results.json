@@ -1,0 +1,64 @@
+{
+  "date": "2026-09-22",
+  "project": "pop3",
+  "package": "cheng-jun56/pop3",
+  "version": "0.5.0",
+  "code_base_commit_before_materials": "54030db51d266b292250a3ec5f16502036febad2",
+  "core_checks": [
+    {
+      "command": [
+        "moon",
+        "test",
+        "--target",
+        "js"
+      ],
+      "exit": 0,
+      "seconds": 2.21,
+      "log": "pop3-test---target-js.log"
+    },
+    {
+      "command": [
+        "moon",
+        "test",
+        "--target",
+        "wasm-gc"
+      ],
+      "exit": 0,
+      "seconds": 1.56,
+      "log": "pop3-test---target-wasm-gc.log"
+    },
+    {
+      "command": [
+        "moon",
+        "build",
+        "--target",
+        "js"
+      ],
+      "exit": 0,
+      "seconds": 1.17,
+      "log": "pop3-build---target-js.log"
+    }
+  ],
+  "workflow_checks": [
+    {
+      "command": [
+        "node",
+        "tools/test-extensions.mjs"
+      ],
+      "exit": 0,
+      "seconds": 0.24,
+      "log": "pop3-workflow-0.log"
+    },
+    {
+      "command": [
+        "node",
+        "tools/test-network.mjs"
+      ],
+      "exit": 0,
+      "log": "pop3-workflow-network.log"
+    }
+  ],
+  "interpretation": "本轮 APOP/CAPA 认证扩展及分片回复、二进制拉取、QUIT、超时/取消路径验证通过；UIDL 命令由核心测试覆盖，完整备份应用尚未提供，不能据此宣称增量备份端到端验收。",
+  "limit": "这里只提供协议与客户端，完整备份调度/去重数据库由应用承担。QUIT 丢响应时提交状态不确定，不能承诺已撤销删除。",
+  "remote_push_performed": false
+}

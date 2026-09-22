@@ -1,0 +1,1 @@
+[{"name":"fragmented greeting login binary retrieval rejection and quit","passed":true},{"name":"greeting timeout","passed":true},{"name":"truncated response rejects pending command","passed":true},{"name":"pending command protection and cancellation","passed":true},{"name":"command injection rejected before transport","passed":true}]
