@@ -1,0 +1,5 @@
++OK message follows
+Subject: archive
+
+..dot-prefixed line
+.

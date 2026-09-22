@@ -1,0 +1,14 @@
+{
+  "title": "还原 RETR 的点转义邮件字节",
+  "scope": "离线合成报文；没有声称完整 UIDL 备份调度已经实现。",
+  "steps": [
+    {
+      "args": [
+        "tools/cli.mjs",
+        "--file",
+        "examples/use-case/retr.txt"
+      ]
+    }
+  ],
+  "expected": "正文中的两个点还原为一个，终止行不进入正文；不会请求 DELE。"
+}

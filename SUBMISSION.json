@@ -1,0 +1,17 @@
+{
+  "project": "pop3",
+  "title": "POP3 取信与删除事务会话核心",
+  "module": "cheng-jun56/pop3",
+  "version": "0.5.0",
+  "repository": "https://github.com/cheng-jun56/moonbit-pop3",
+  "status": "条件复审",
+  "remainingRisk": "尚未交付完整 UIDL 去重备份程序；不再以“增量备份工具”标题超出实现。",
+  "actualUsersClaimed": false,
+  "anonymousCloneVerified": true,
+  "publicHead": "1506239811443f4e896f70fa50dcd1613656e038",
+  "defaultBranch": "origin/main",
+  "localChangesPublished": false,
+  "proposalLines": 25,
+  "useCase": "还原 RETR 的点转义邮件字节",
+  "diff": "SMTP/MIME 已有邻接组件；本项目的 POP3 取信与删除提交语义不同于 IMAP 同步和 Maildir 归档。没有宣称整个邮件生态空白，也没有把多个层写成同一功能。"
+}
